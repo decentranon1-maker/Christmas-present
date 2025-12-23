@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Present Catch ☕🎁</title>
+<title>The Present Catch 🧺🎁</title>
 <style>
   body {
     margin: 0;
@@ -90,7 +90,7 @@ let W = window.innerWidth, H = window.innerHeight;
 canvas.width = W; canvas.height = H;
 
 let score = 0, lives = 3, speed = 5;
-let mug = { x: W/2 - 60, y: H - 130, w: 130, h: 110 };
+let basket = { x: W/2 - 35, y: H - 100, w: 70, h: 60 }; // smaller basket
 let objects = [];
 let gameOver = false;
 let waveTimer = 0;
@@ -104,9 +104,9 @@ candyImg.src = "https://cdn-icons-png.flaticon.com/512/2909/2909769.png";
 const coalImg = new Image();
 coalImg.src = "https://cdn-icons-png.flaticon.com/512/1411/1411814.png";
 
-/* ☕ Realistic 3D Cup PNG */
-const mugImg = new Image();
-mugImg.src = "https://cdn-icons-png.flaticon.com/512/6634/6634613.png";
+/* 🧺 Realistic Net Basket PNG */
+const basketImg = new Image();
+basketImg.src = "https://cdn-icons-png.flaticon.com/512/2991/2991122.png";
 
 function spawnObject() {
   const types = ['gift', 'candy', 'coal'];
@@ -147,8 +147,8 @@ function drawObjects() {
   }
 }
 
-function drawMug() {
-  ctx.drawImage(mugImg, mug.x, mug.y, mug.w, mug.h);
+function drawBasket() {
+  ctx.drawImage(basketImg, basket.x, basket.y, basket.w, basket.h);
 }
 
 function updateObjects() {
@@ -156,8 +156,8 @@ function updateObjects() {
     o.y += o.vy;
     if (o.opacity < 1) o.opacity += 0.05;
 
-    if (o.y + o.h >= mug.y + 10 && o.y + o.h <= mug.y + mug.h &&
-        o.x + o.w >= mug.x && o.x <= mug.x + mug.w) {
+    if (o.y + o.h >= basket.y && o.y + o.h <= basket.y + basket.h &&
+        o.x + o.w >= basket.x && o.x <= basket.x + basket.w) {
       if (o.type === 'gift') score += 10;
       else if (o.type === 'candy') score += 5;
       else {
@@ -193,7 +193,7 @@ function loop() {
   ctx.clearRect(0, 0, W, H);
   drawBackground();
   drawObjects();
-  drawMug();
+  drawBasket();
   updateObjects();
   updateHUD();
 
@@ -208,11 +208,11 @@ function loop() {
 }
 
 document.addEventListener("mousemove", e => {
-  mug.x = e.clientX - mug.w/2;
+  basket.x = e.clientX - basket.w/2;
 });
 
 document.addEventListener("touchmove", e => {
-  mug.x = e.touches[0].clientX - mug.w/2;
+  basket.x = e.touches[0].clientX - basket.w/2;
 });
 
 loop();
