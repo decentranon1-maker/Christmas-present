@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Present Catch 🧺🎁</title>
+<title>The Present Catch 🍽️🎁</title>
 <style>
   body {
     margin: 0;
@@ -52,7 +52,7 @@
     transform: scale(1.05);
   }
 
-  /* Subtle snow overlay */
+  /* Snow overlay */
   @keyframes snowfall {
     0% {background-position: 0 0;}
     100% {background-position: 0 1000px;}
@@ -90,7 +90,7 @@ let W = window.innerWidth, H = window.innerHeight;
 canvas.width = W; canvas.height = H;
 
 let score = 0, lives = 3, speed = 5;
-let basket = { x: W/2 - 35, y: H - 100, w: 70, h: 60 }; // smaller basket
+let plate = { x: W/2 - 45, y: H - 90, w: 90, h: 35 }; // realistic plate proportions
 let objects = [];
 let gameOver = false;
 let waveTimer = 0;
@@ -104,9 +104,9 @@ candyImg.src = "https://cdn-icons-png.flaticon.com/512/2909/2909769.png";
 const coalImg = new Image();
 coalImg.src = "https://cdn-icons-png.flaticon.com/512/1411/1411814.png";
 
-/* 🧺 Realistic Net Basket PNG */
-const basketImg = new Image();
-basketImg.src = "https://cdn-icons-png.flaticon.com/512/2991/2991122.png";
+/* 🍽️ Realistic Plate PNG */
+const plateImg = new Image();
+plateImg.src = "https://cdn-icons-png.flaticon.com/512/3076/3076989.png"; 
 
 function spawnObject() {
   const types = ['gift', 'candy', 'coal'];
@@ -147,8 +147,11 @@ function drawObjects() {
   }
 }
 
-function drawBasket() {
-  ctx.drawImage(basketImg, basket.x, basket.y, basket.w, basket.h);
+function drawPlate() {
+  ctx.shadowColor = "rgba(0,0,0,0.3)";
+  ctx.shadowBlur = 12;
+  ctx.drawImage(plateImg, plate.x, plate.y, plate.w, plate.h);
+  ctx.shadowBlur = 0;
 }
 
 function updateObjects() {
@@ -156,8 +159,8 @@ function updateObjects() {
     o.y += o.vy;
     if (o.opacity < 1) o.opacity += 0.05;
 
-    if (o.y + o.h >= basket.y && o.y + o.h <= basket.y + basket.h &&
-        o.x + o.w >= basket.x && o.x <= basket.x + basket.w) {
+    if (o.y + o.h >= plate.y && o.y + o.h <= plate.y + plate.h &&
+        o.x + o.w >= plate.x && o.x <= plate.x + plate.w) {
       if (o.type === 'gift') score += 10;
       else if (o.type === 'candy') score += 5;
       else {
@@ -193,26 +196,26 @@ function loop() {
   ctx.clearRect(0, 0, W, H);
   drawBackground();
   drawObjects();
-  drawBasket();
+  drawPlate();
   updateObjects();
   updateHUD();
 
   waveTimer++;
-  if (Math.random() < 0.07) spawnObject(); 
+  if (Math.random() < 0.08) spawnObject(); 
   if (waveTimer % 400 === 0) {
     for (let i = 0; i < 5; i++) spawnObject();
   }
 
-  speed += 0.001;
+  speed += 0.0015;
   requestAnimationFrame(loop);
 }
 
 document.addEventListener("mousemove", e => {
-  basket.x = e.clientX - basket.w/2;
+  plate.x = e.clientX - plate.w/2;
 });
 
 document.addEventListener("touchmove", e => {
-  basket.x = e.touches[0].clientX - basket.w/2;
+  plate.x = e.touches[0].clientX - plate.w/2;
 });
 
 loop();
