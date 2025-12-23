@@ -3,131 +3,189 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Present Catch — Christmas Arcade Edition</title>
+<title>The Present Catch 🎁</title>
 <style>
-html,body{margin:0;padding:0;overflow:hidden;height:100%;background:#cce6ff;font-family:system-ui,sans-serif;}
-canvas{display:block;}
-#startScreen,#gameOverScreen{
-  position:absolute;top:0;left:0;width:100%;height:100%;
-  background:linear-gradient(to bottom,#e6f3ff,#b3d9ff);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  color:#d62828;text-shadow:0 0 10px white;
-}
-h1{font-size:2.2em;margin-bottom:20px;}
-button{padding:12px 25px;font-size:1.1em;border:none;border-radius:8px;cursor:pointer;background:#1a8e3b;color:white;box-shadow:0 0 10px #fff;}
-button:hover{background:#27ae60;}
-#hud{position:absolute;top:10px;left:0;width:100%;display:flex;justify-content:space-between;padding:0 20px;font-size:1.2em;color:#fff;text-shadow:0 0 5px #000;font-weight:bold;}
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #e6f7ff, #99ccff);
+    font-family: 'Poppins', sans-serif;
+    color: white;
+  }
+
+  #hud {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+  }
+
+  #gameover {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    display: none;
+  }
+
+  button {
+    background: #e63946;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    font-size: 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+  }
 </style>
 </head>
 <body>
-<div id="startScreen">
-  <h1>🎄 The Present Catch 🎁</h1>
-  <button id="playBtn">Play Game</button>
-</div>
-<div id="gameOverScreen" style="display:none;">
-  <h1>🎅 Game Over 🎅</h1>
-  <p id="finalScore"></p>
-  <button id="restartBtn">Play Again</button>
-</div>
-<canvas id="game"></canvas>
-<div id="hud" style="display:none;">
+<div id="hud">
   <div id="score">Score: 0</div>
   <div id="lives">Lives: ❤️❤️❤️</div>
 </div>
+<canvas id="game"></canvas>
+<div id="gameover">
+  <h1>🎅 Game Over!</h1>
+  <p id="finalScore"></p>
+  <button onclick="restart()">Play Again</button>
+</div>
+
 <script>
-const canvas=document.getElementById('game');
-const ctx=canvas.getContext('2d');
-let W,H;function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}resize();window.onresize=resize;
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+let W = window.innerWidth, H = window.innerHeight;
+canvas.width = W; canvas.height = H;
 
-let gameRunning=false,score=0,lives=3,objects=[],speed=2,playerX=0;
-const sackImg=new Image();sackImg.src='https://cdn-icons-png.flaticon.com/512/615/615075.png';
-const giftImg=new Image();giftImg.src='https://cdn-icons-png.flaticon.com/512/2541/2541981.png';
-const candyImg=new Image();candyImg.src='https://cdn-icons-png.flaticon.com/512/2784/2784065.png';
-const coalImg=new Image();coalImg.src='https://cdn-icons-png.flaticon.com/512/616/616408.png';
+let score = 0, lives = 3, speed = 3;
+let sack = { x: W/2 - 50, y: H - 120, w: 100, h: 80 };
+let objects = [];
+let gameOver = false;
 
-function startGame(){
-  document.getElementById('startScreen').style.display='none';
-  document.getElementById('gameOverScreen').style.display='none';
-  document.getElementById('hud').style.display='flex';
-  gameRunning=true;score=0;lives=3;speed=2;objects=[];playerX=W/2-40;
-  loop();
+const giftImg = new Image();
+giftImg.src = "https://cdn-icons-png.flaticon.com/512/1299/1299747.png";
+
+const candyImg = new Image();
+candyImg.src = "https://cdn-icons-png.flaticon.com/512/2909/2909769.png";
+
+const coalImg = new Image();
+coalImg.src = "https://cdn-icons-png.flaticon.com/512/1411/1411814.png";
+
+const sackImg = new Image();
+sackImg.src = "https://cdn-icons-png.flaticon.com/512/3089/3089678.png";
+
+function spawnObject() {
+  const types = ['gift', 'candy', 'coal'];
+  const type = types[Math.floor(Math.random() * types.length)];
+  const x = Math.random() * (W - 40);
+  const y = -50; 
+  objects.push({
+    x: x,
+    y: y,
+    w: 40,
+    h: 40,
+    type: type,
+    vy: speed + Math.random() * 2,
+    opacity: 0
+  });
 }
 
-function spawnObject(){
-  const types=['gift','candy','coal'];
-  const type=types[Math.floor(Math.random()*types.length)];
-  const x=Math.random()*(W-40);
-  objects.push({x,y:-50,w:40,h:40,type,vy:speed+Math.random()*2,opacity:0});
+function drawBackground() {
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, "#e6f7ff");
+  grad.addColorStop(1, "#99ccff");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
 }
 
-let frame=0;
-function drawSnow(){
-  ctx.fillStyle='#cce6ff';ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='rgba(255,255,255,0.8)';
-  for(let i=0;i<50;i++){
-    const x=(i*80+frame*0.5)%W;
-    const y=(i*40+frame)%H;
-    ctx.fillRect(x,y,2,2);
+function drawObjects() {
+  for (let o of objects) {
+    let img;
+    if (o.type === 'gift') img = giftImg;
+    else if (o.type === 'candy') img = candyImg;
+    else img = coalImg;
+
+    ctx.globalAlpha = o.opacity;
+    ctx.drawImage(img, o.x, o.y, o.w, o.h);
+    ctx.globalAlpha = 1;
   }
 }
 
-function drawPlayer(){
-  ctx.drawImage(sackImg,playerX,H-100,80,80);
+function drawSack() {
+  ctx.drawImage(sackImg, sack.x, sack.y, sack.w, sack.h);
 }
 
-function drawObjects(){
-  objects.forEach(o=>{
-    if(o.opacity<1)o.opacity+=0.05;
-    ctx.globalAlpha=o.opacity;
-    if(o.type==='gift')ctx.drawImage(giftImg,o.x,o.y,o.w,o.h);
-    else if(o.type==='candy')ctx.drawImage(candyImg,o.x,o.y,o.w,o.h);
-    else ctx.drawImage(coalImg,o.x,o.y,o.w,o.h);
-    ctx.globalAlpha=1;
-  });
-}
-
-function updateObjects(){
-  objects.forEach(o=>o.y+=o.vy);
-  objects=objects.filter(o=>o.y<H+50);
-  objects.forEach(o=>{
-    if(o.y>H-120&&o.x+o.w>playerX&&o.x<playerX+80){
-      if(o.type==='gift')score+=10;
-      else if(o.type==='candy')score+=5;
-      else if(o.type==='coal'){lives--;if(lives<=0)endGame();}
-      o.y=H+100;
+function updateObjects() {
+  for (let o of objects) {
+    o.y += o.vy;
+    if (o.opacity < 1) o.opacity += 0.05;
+    // collision
+    if (o.y + o.h >= sack.y && o.y + o.h <= sack.y + sack.h &&
+        o.x + o.w >= sack.x && o.x <= sack.x + sack.w) {
+      if (o.type === 'gift') score += 10;
+      else if (o.type === 'candy') score += 5;
+      else {
+        lives--;
+        if (lives <= 0) endGame();
+      }
+      o.remove = true;
     }
-  });
+    if (o.y > H) o.remove = true;
+  }
+  objects = objects.filter(o => !o.remove);
 }
 
-function endGame(){
-  gameRunning=false;
-  document.getElementById('finalScore').innerText=`Final Score: ${score}`;
-  document.getElementById('gameOverScreen').style.display='flex';
-  document.getElementById('hud').style.display='none';
+function updateHUD() {
+  document.getElementById("score").textContent = "Score: " + score;
+  document.getElementById("lives").textContent = "Lives: " + "❤️".repeat(lives);
 }
 
-function loop(){
-  if(!gameRunning)return;
-  frame++;
-  drawSnow();
-  if(frame%50===0)spawnObject();
-  updateObjects();
+function endGame() {
+  gameOver = true;
+  document.getElementById("finalScore").textContent = "Final Score: " + score;
+  document.getElementById("gameover").style.display = "block";
+}
+
+function restart() {
+  score = 0; lives = 3; speed = 3; objects = []; gameOver = false;
+  document.getElementById("gameover").style.display = "none";
+  loop();
+}
+
+function loop() {
+  if (gameOver) return;
+  ctx.clearRect(0, 0, W, H);
+  drawBackground();
   drawObjects();
-  drawPlayer();
-  document.getElementById('score').innerText='Score: '+score;
-  document.getElementById('lives').innerText='Lives: '+('❤️'.repeat(lives));
-  if(score>0&&score%50===0)speed+=0.05;
+  drawSack();
+  updateObjects();
+  updateHUD();
+  if (Math.random() < 0.03) spawnObject();
+  speed += 0.0003;
   requestAnimationFrame(loop);
 }
 
-// controls
-window.addEventListener('mousemove',e=>{playerX=e.clientX-40;});
-window.addEventListener('touchmove',e=>{playerX=e.touches[0].clientX-40;});
-window.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')playerX-=40;if(e.key==='ArrowRight')playerX+=40;});
+document.addEventListener("mousemove", e => {
+  sack.x = e.clientX - sack.w/2;
+});
 
-// buttons
-document.getElementById('playBtn').onclick=startGame;
-document.getElementById('restartBtn').onclick=startGame;
+document.addEventListener("touchmove", e => {
+  sack.x = e.touches[0].clientX - sack.w/2;
+});
+
+loop();
 </script>
 </body>
 </html>
