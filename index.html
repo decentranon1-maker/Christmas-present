@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Present Catch 🎄</title>
+<title>The Present Catch ☕🎁</title>
 <style>
   body {
     margin: 0;
@@ -23,6 +23,7 @@
     font-size: 20px;
     font-weight: bold;
     text-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+    z-index: 2;
   }
 
   #gameover {
@@ -32,6 +33,7 @@
     transform: translate(-50%, -50%);
     text-align: center;
     display: none;
+    z-index: 3;
   }
 
   button {
@@ -50,7 +52,7 @@
     transform: scale(1.05);
   }
 
-  /* Subtle snow overlay effect */
+  /* Subtle snow overlay */
   @keyframes snowfall {
     0% {background-position: 0 0;}
     100% {background-position: 0 1000px;}
@@ -88,7 +90,7 @@ let W = window.innerWidth, H = window.innerHeight;
 canvas.width = W; canvas.height = H;
 
 let score = 0, lives = 3, speed = 5;
-let sack = { x: W/2 - 60, y: H - 130, w: 120, h: 100 };
+let mug = { x: W/2 - 60, y: H - 130, w: 130, h: 110 };
 let objects = [];
 let gameOver = false;
 let waveTimer = 0;
@@ -102,9 +104,9 @@ candyImg.src = "https://cdn-icons-png.flaticon.com/512/2909/2909769.png";
 const coalImg = new Image();
 coalImg.src = "https://cdn-icons-png.flaticon.com/512/1411/1411814.png";
 
-/* 🧺 New Realistic Basket Image */
-const sackImg = new Image();
-sackImg.src = "https://cdn-icons-png.flaticon.com/512/7439/7439382.png"; 
+/* ☕ Realistic 3D Cup PNG */
+const mugImg = new Image();
+mugImg.src = "https://cdn-icons-png.flaticon.com/512/6634/6634613.png";
 
 function spawnObject() {
   const types = ['gift', 'candy', 'coal'];
@@ -145,8 +147,8 @@ function drawObjects() {
   }
 }
 
-function drawSack() {
-  ctx.drawImage(sackImg, sack.x, sack.y, sack.w, sack.h);
+function drawMug() {
+  ctx.drawImage(mugImg, mug.x, mug.y, mug.w, mug.h);
 }
 
 function updateObjects() {
@@ -154,8 +156,8 @@ function updateObjects() {
     o.y += o.vy;
     if (o.opacity < 1) o.opacity += 0.05;
 
-    if (o.y + o.h >= sack.y && o.y + o.h <= sack.y + sack.h &&
-        o.x + o.w >= sack.x && o.x <= sack.x + sack.w) {
+    if (o.y + o.h >= mug.y + 10 && o.y + o.h <= mug.y + mug.h &&
+        o.x + o.w >= mug.x && o.x <= mug.x + mug.w) {
       if (o.type === 'gift') score += 10;
       else if (o.type === 'candy') score += 5;
       else {
@@ -191,7 +193,7 @@ function loop() {
   ctx.clearRect(0, 0, W, H);
   drawBackground();
   drawObjects();
-  drawSack();
+  drawMug();
   updateObjects();
   updateHUD();
 
@@ -206,11 +208,11 @@ function loop() {
 }
 
 document.addEventListener("mousemove", e => {
-  sack.x = e.clientX - sack.w/2;
+  mug.x = e.clientX - mug.w/2;
 });
 
 document.addEventListener("touchmove", e => {
-  sack.x = e.touches[0].clientX - sack.w/2;
+  mug.x = e.touches[0].clientX - mug.w/2;
 });
 
 loop();
