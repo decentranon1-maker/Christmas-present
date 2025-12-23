@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Present Catch 🧺🎁</title>
+<title>The Present Catch 🎅 Christmas Cap Edition</title>
 <style>
   body {
     margin: 0;
     overflow: hidden;
-    background: linear-gradient(180deg, #b30000 0%, #006600 100%);
+    background: linear-gradient(to bottom right, #b30000, #ffffff, #006600);
     font-family: 'Poppins', sans-serif;
     color: white;
   }
@@ -22,7 +22,7 @@
     justify-content: space-between;
     font-size: 20px;
     font-weight: bold;
-    text-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.4);
     z-index: 2;
   }
 
@@ -37,22 +37,22 @@
   }
 
   button {
-    background: #e63946;
+    background: #d62828;
     color: #fff;
     border: none;
-    padding: 12px 20px;
+    padding: 12px 24px;
     font-size: 18px;
     border-radius: 6px;
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    transition: transform 0.2s;
+    transition: all 0.2s ease-in-out;
   }
 
   button:hover {
+    background: #e63946;
     transform: scale(1.05);
   }
 
-  /* Subtle snow overlay */
   @keyframes snowfall {
     0% {background-position: 0 0;}
     100% {background-position: 0 1000px;}
@@ -67,7 +67,7 @@
     pointer-events: none;
     background: url('https://png.pngtree.com/png-vector/20231212/ourmid/pngtree-white-snow-particles-falling-on-red-background-png-image_11315645.png');
     opacity: 0.25;
-    animation: snowfall 20s linear infinite;
+    animation: snowfall 18s linear infinite;
   }
 </style>
 </head>
@@ -89,31 +89,34 @@ const ctx = canvas.getContext("2d");
 let W = window.innerWidth, H = window.innerHeight;
 canvas.width = W; canvas.height = H;
 
-let score = 0, lives = 3, speed = 5;
-let basket = { x: W/2 - 35, y: H - 100, w: 70, h: 60 }; // smaller basket
+let score = 0, lives = 3, speed = 6;
+let cap = { x: W/2 - 50, y: H - 120, w: 120, h: 80 };
 let objects = [];
 let gameOver = false;
 let waveTimer = 0;
 
 const giftImg = new Image();
 giftImg.src = "https://cdn-icons-png.flaticon.com/512/1299/1299747.png";
-
 const candyImg = new Image();
 candyImg.src = "https://cdn-icons-png.flaticon.com/512/2909/2909769.png";
-
 const coalImg = new Image();
 coalImg.src = "https://cdn-icons-png.flaticon.com/512/1411/1411814.png";
 
-/* 🧺 Realistic Net Basket PNG */
-const basketImg = new Image();
-basketImg.src = "https://cdn-icons-png.flaticon.com/512/2991/2991122.png";
+function drawBackground() {
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, "#ffcccc");
+  grad.addColorStop(0.5, "#ffffff");
+  grad.addColorStop(1, "#006600");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+}
 
 function spawnObject() {
   const types = ['gift', 'candy', 'coal'];
   const type = types[Math.floor(Math.random() * types.length)];
   const x = Math.random() * (W - 50);
-  const y = -60; 
-  const size = 30 + Math.random() * 30; 
+  const y = -60;
+  const size = 30 + Math.random() * 25;
   objects.push({
     x: x,
     y: y,
@@ -125,30 +128,46 @@ function spawnObject() {
   });
 }
 
-function drawBackground() {
-  const grad = ctx.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, "#ffcccc");
-  grad.addColorStop(0.5, "#ffffff");
-  grad.addColorStop(1, "#006600");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, W, H);
-}
-
 function drawObjects() {
   for (let o of objects) {
-    let img;
-    if (o.type === 'gift') img = giftImg;
-    else if (o.type === 'candy') img = candyImg;
-    else img = coalImg;
-
+    let img = (o.type === 'gift') ? giftImg : (o.type === 'candy' ? candyImg : coalImg);
     ctx.globalAlpha = o.opacity;
     ctx.drawImage(img, o.x, o.y, o.w, o.h);
     ctx.globalAlpha = 1;
   }
 }
 
-function drawBasket() {
-  ctx.drawImage(basketImg, basket.x, basket.y, basket.w, basket.h);
+function drawCap() {
+  const grd = ctx.createLinearGradient(cap.x, cap.y, cap.x, cap.y + cap.h);
+  grd.addColorStop(0, "#ff3b3b");
+  grd.addColorStop(0.5, "#cc0000");
+  grd.addColorStop(1, "#800000");
+  ctx.fillStyle = grd;
+  ctx.beginPath();
+  ctx.moveTo(cap.x, cap.y + 40);
+  ctx.quadraticCurveTo(cap.x + cap.w/2, cap.y - 20, cap.x + cap.w, cap.y + 40);
+  ctx.lineTo(cap.x + cap.w, cap.y + cap.h);
+  ctx.lineTo(cap.x, cap.y + cap.h);
+  ctx.closePath();
+  ctx.shadowColor = "rgba(0,0,0,0.3)";
+  ctx.shadowBlur = 10;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // White brim
+  ctx.fillStyle = "white";
+  ctx.beginPath();
+  ctx.ellipse(cap.x + cap.w/2, cap.y + cap.h - 10, cap.w/2.2, 15, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // White pom-pom
+  ctx.beginPath();
+  ctx.arc(cap.x + cap.w/2, cap.y + 10, 10, 0, Math.PI * 2);
+  ctx.fillStyle = "#fff";
+  ctx.shadowColor = "#fff";
+  ctx.shadowBlur = 10;
+  ctx.fill();
+  ctx.shadowBlur = 0;
 }
 
 function updateObjects() {
@@ -156,8 +175,9 @@ function updateObjects() {
     o.y += o.vy;
     if (o.opacity < 1) o.opacity += 0.05;
 
-    if (o.y + o.h >= basket.y && o.y + o.h <= basket.y + basket.h &&
-        o.x + o.w >= basket.x && o.x <= basket.x + basket.w) {
+    // Collision detection
+    if (o.y + o.h >= cap.y && o.y + o.h <= cap.y + cap.h &&
+        o.x + o.w >= cap.x && o.x <= cap.x + cap.w) {
       if (o.type === 'gift') score += 10;
       else if (o.type === 'candy') score += 5;
       else {
@@ -183,7 +203,7 @@ function endGame() {
 }
 
 function restart() {
-  score = 0; lives = 3; speed = 5; objects = []; gameOver = false;
+  score = 0; lives = 3; speed = 6; objects = []; gameOver = false;
   document.getElementById("gameover").style.display = "none";
   loop();
 }
@@ -193,27 +213,19 @@ function loop() {
   ctx.clearRect(0, 0, W, H);
   drawBackground();
   drawObjects();
-  drawBasket();
+  drawCap();
   updateObjects();
   updateHUD();
 
   waveTimer++;
-  if (Math.random() < 0.07) spawnObject(); 
-  if (waveTimer % 400 === 0) {
-    for (let i = 0; i < 5; i++) spawnObject();
-  }
-
-  speed += 0.001;
+  if (Math.random() < 0.08) spawnObject();
+  if (waveTimer % 300 === 0) for (let i = 0; i < 4; i++) spawnObject();
+  speed += 0.002;
   requestAnimationFrame(loop);
 }
 
-document.addEventListener("mousemove", e => {
-  basket.x = e.clientX - basket.w/2;
-});
-
-document.addEventListener("touchmove", e => {
-  basket.x = e.touches[0].clientX - basket.w/2;
-});
+document.addEventListener("mousemove", e => { cap.x = e.clientX - cap.w/2; });
+document.addEventListener("touchmove", e => { cap.x = e.touches[0].clientX - cap.w/2; });
 
 loop();
 </script>
