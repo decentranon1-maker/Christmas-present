@@ -69,10 +69,11 @@ const ctx = canvas.getContext("2d");
 let W = window.innerWidth, H = window.innerHeight;
 canvas.width = W; canvas.height = H;
 
-let score = 0, lives = 3, speed = 3;
+let score = 0, lives = 3, speed = 5;
 let sack = { x: W/2 - 50, y: H - 120, w: 100, h: 80 };
 let objects = [];
 let gameOver = false;
+let waveTimer = 0;
 
 const giftImg = new Image();
 giftImg.src = "https://cdn-icons-png.flaticon.com/512/1299/1299747.png";
@@ -89,15 +90,16 @@ sackImg.src = "https://cdn-icons-png.flaticon.com/512/3089/3089678.png";
 function spawnObject() {
   const types = ['gift', 'candy', 'coal'];
   const type = types[Math.floor(Math.random() * types.length)];
-  const x = Math.random() * (W - 40);
-  const y = -50; 
+  const x = Math.random() * (W - 50);
+  const y = -60; 
+  const size = 30 + Math.random() * 30; 
   objects.push({
     x: x,
     y: y,
-    w: 40,
-    h: 40,
+    w: size,
+    h: size,
     type: type,
-    vy: speed + Math.random() * 2,
+    vy: speed + Math.random() * 3,
     opacity: 0
   });
 }
@@ -137,7 +139,7 @@ function updateObjects() {
       if (o.type === 'gift') score += 10;
       else if (o.type === 'candy') score += 5;
       else {
-        lives--;
+        lives--; // Coal removes 1 life
         if (lives <= 0) endGame();
       }
       o.remove = true;
@@ -159,7 +161,7 @@ function endGame() {
 }
 
 function restart() {
-  score = 0; lives = 3; speed = 3; objects = []; gameOver = false;
+  score = 0; lives = 3; speed = 5; objects = []; gameOver = false;
   document.getElementById("gameover").style.display = "none";
   loop();
 }
@@ -172,8 +174,15 @@ function loop() {
   drawSack();
   updateObjects();
   updateHUD();
-  if (Math.random() < 0.03) spawnObject();
-  speed += 0.0003;
+
+  // Wave system
+  waveTimer++;
+  if (Math.random() < 0.07) spawnObject(); 
+  if (waveTimer % 400 === 0) {
+    for (let i = 0; i < 5; i++) spawnObject();
+  }
+
+  speed += 0.001;
   requestAnimationFrame(loop);
 }
 
