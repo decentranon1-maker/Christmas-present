@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Present Catch 🎅 Christmas Cap Edition</title>
+<title>The Present Catch 🎅 Christmas Cap Edition (Final)</title>
 <style>
   body {
     margin: 0;
@@ -90,7 +90,7 @@ let W = window.innerWidth, H = window.innerHeight;
 canvas.width = W; canvas.height = H;
 
 let score = 0, lives = 3, speed = 6;
-let cap = { x: W/2 - 50, y: H - 120, w: 120, h: 80 };
+let cap = { x: W/2 - 40, y: H - 100, w: 80, h: 55 }; // smaller inverted cap
 let objects = [];
 let gameOver = false;
 let waveTimer = 0;
@@ -139,33 +139,36 @@ function drawObjects() {
 
 function drawCap() {
   const grd = ctx.createLinearGradient(cap.x, cap.y, cap.x, cap.y + cap.h);
-  grd.addColorStop(0, "#ff3b3b");
-  grd.addColorStop(0.5, "#cc0000");
+  grd.addColorStop(0, "#cc0000");
+  grd.addColorStop(0.5, "#ff3333");
   grd.addColorStop(1, "#800000");
   ctx.fillStyle = grd;
+
+  // Inverted cap (open upwards)
   ctx.beginPath();
-  ctx.moveTo(cap.x, cap.y + 40);
-  ctx.quadraticCurveTo(cap.x + cap.w/2, cap.y - 20, cap.x + cap.w, cap.y + 40);
+  ctx.moveTo(cap.x, cap.y + 10);
+  ctx.quadraticCurveTo(cap.x + cap.w/2, cap.y + cap.h + 15, cap.x + cap.w, cap.y + 10);
   ctx.lineTo(cap.x + cap.w, cap.y + cap.h);
   ctx.lineTo(cap.x, cap.y + cap.h);
   ctx.closePath();
+
   ctx.shadowColor = "rgba(0,0,0,0.3)";
   ctx.shadowBlur = 10;
   ctx.fill();
   ctx.shadowBlur = 0;
 
-  // White brim
+  // White fuzzy brim
   ctx.fillStyle = "white";
   ctx.beginPath();
-  ctx.ellipse(cap.x + cap.w/2, cap.y + cap.h - 10, cap.w/2.2, 15, 0, 0, Math.PI * 2);
+  ctx.ellipse(cap.x + cap.w/2, cap.y + cap.h, cap.w/2.1, 8, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // White pom-pom
+  // Pom-pom highlight for realism
   ctx.beginPath();
-  ctx.arc(cap.x + cap.w/2, cap.y + 10, 10, 0, Math.PI * 2);
+  ctx.arc(cap.x + cap.w/2, cap.y + cap.h + 10, 5, 0, Math.PI * 2);
   ctx.fillStyle = "#fff";
   ctx.shadowColor = "#fff";
-  ctx.shadowBlur = 10;
+  ctx.shadowBlur = 8;
   ctx.fill();
   ctx.shadowBlur = 0;
 }
@@ -175,7 +178,6 @@ function updateObjects() {
     o.y += o.vy;
     if (o.opacity < 1) o.opacity += 0.05;
 
-    // Collision detection
     if (o.y + o.h >= cap.y && o.y + o.h <= cap.y + cap.h &&
         o.x + o.w >= cap.x && o.x <= cap.x + cap.w) {
       if (o.type === 'gift') score += 10;
@@ -220,7 +222,7 @@ function loop() {
   waveTimer++;
   if (Math.random() < 0.08) spawnObject();
   if (waveTimer % 300 === 0) for (let i = 0; i < 4; i++) spawnObject();
-  speed += 0.002;
+  speed += 0.0015;
   requestAnimationFrame(loop);
 }
 
