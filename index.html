@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Present Catch 🎁</title>
+<title>The Present Catch 🎄</title>
 <style>
   body {
     margin: 0;
     overflow: hidden;
-    background: linear-gradient(to bottom, #e6f7ff, #99ccff);
+    background: linear-gradient(180deg, #b30000 0%, #006600 100%);
     font-family: 'Poppins', sans-serif;
     color: white;
   }
@@ -49,6 +49,24 @@
   button:hover {
     transform: scale(1.05);
   }
+
+  /* Subtle snow overlay effect */
+  @keyframes snowfall {
+    0% {background-position: 0 0;}
+    100% {background-position: 0 1000px;}
+  }
+  body::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background: url('https://png.pngtree.com/png-vector/20231212/ourmid/pngtree-white-snow-particles-falling-on-red-background-png-image_11315645.png');
+    opacity: 0.25;
+    animation: snowfall 20s linear infinite;
+  }
 </style>
 </head>
 <body>
@@ -70,7 +88,7 @@ let W = window.innerWidth, H = window.innerHeight;
 canvas.width = W; canvas.height = H;
 
 let score = 0, lives = 3, speed = 5;
-let sack = { x: W/2 - 50, y: H - 120, w: 100, h: 80 };
+let sack = { x: W/2 - 60, y: H - 130, w: 120, h: 100 };
 let objects = [];
 let gameOver = false;
 let waveTimer = 0;
@@ -84,8 +102,9 @@ candyImg.src = "https://cdn-icons-png.flaticon.com/512/2909/2909769.png";
 const coalImg = new Image();
 coalImg.src = "https://cdn-icons-png.flaticon.com/512/1411/1411814.png";
 
+/* 🧺 New Realistic Basket Image */
 const sackImg = new Image();
-sackImg.src = "https://cdn-icons-png.flaticon.com/512/3089/3089678.png";
+sackImg.src = "https://cdn-icons-png.flaticon.com/512/7439/7439382.png"; 
 
 function spawnObject() {
   const types = ['gift', 'candy', 'coal'];
@@ -106,8 +125,9 @@ function spawnObject() {
 
 function drawBackground() {
   const grad = ctx.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, "#e6f7ff");
-  grad.addColorStop(1, "#99ccff");
+  grad.addColorStop(0, "#ffcccc");
+  grad.addColorStop(0.5, "#ffffff");
+  grad.addColorStop(1, "#006600");
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 }
@@ -133,13 +153,13 @@ function updateObjects() {
   for (let o of objects) {
     o.y += o.vy;
     if (o.opacity < 1) o.opacity += 0.05;
-    // collision
+
     if (o.y + o.h >= sack.y && o.y + o.h <= sack.y + sack.h &&
         o.x + o.w >= sack.x && o.x <= sack.x + sack.w) {
       if (o.type === 'gift') score += 10;
       else if (o.type === 'candy') score += 5;
       else {
-        lives--; // Coal removes 1 life
+        lives--;
         if (lives <= 0) endGame();
       }
       o.remove = true;
@@ -175,7 +195,6 @@ function loop() {
   updateObjects();
   updateHUD();
 
-  // Wave system
   waveTimer++;
   if (Math.random() < 0.07) spawnObject(); 
   if (waveTimer % 400 === 0) {
