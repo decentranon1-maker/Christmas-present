@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Present Catch 🎅 Christmas Cap Edition (Final)</title>
+<title>The Present Catch 🧺</title>
 <style>
   body {
     margin: 0;
@@ -90,7 +90,7 @@ let W = window.innerWidth, H = window.innerHeight;
 canvas.width = W; canvas.height = H;
 
 let score = 0, lives = 3, speed = 6;
-let cap = { x: W/2 - 40, y: H - 100, w: 80, h: 55 }; // smaller inverted cap
+let basket = { x: W/2 - 35, y: H - 90, w: 70, h: 40 }; // small elegant basket
 let objects = [];
 let gameOver = false;
 let waveTimer = 0;
@@ -137,40 +137,42 @@ function drawObjects() {
   }
 }
 
-function drawCap() {
-  const grd = ctx.createLinearGradient(cap.x, cap.y, cap.x, cap.y + cap.h);
-  grd.addColorStop(0, "#cc0000");
-  grd.addColorStop(0.5, "#ff3333");
-  grd.addColorStop(1, "#800000");
-  ctx.fillStyle = grd;
-
-  // Inverted cap (open upwards)
+function drawBasket() {
+  // Handle
+  ctx.lineWidth = 4;
+  const handleGrad = ctx.createLinearGradient(basket.x, basket.y, basket.x + basket.w, basket.y - basket.h);
+  handleGrad.addColorStop(0, "#8b5a2b");
+  handleGrad.addColorStop(1, "#deb887");
+  ctx.strokeStyle = handleGrad;
   ctx.beginPath();
-  ctx.moveTo(cap.x, cap.y + 10);
-  ctx.quadraticCurveTo(cap.x + cap.w/2, cap.y + cap.h + 15, cap.x + cap.w, cap.y + 10);
-  ctx.lineTo(cap.x + cap.w, cap.y + cap.h);
-  ctx.lineTo(cap.x, cap.y + cap.h);
-  ctx.closePath();
+  ctx.arc(basket.x + basket.w / 2, basket.y + 5, basket.w / 2.2, Math.PI, 0);
+  ctx.stroke();
 
+  // Basket body
+  const bodyGrad = ctx.createLinearGradient(basket.x, basket.y, basket.x, basket.y + basket.h);
+  bodyGrad.addColorStop(0, "#c68642");
+  bodyGrad.addColorStop(1, "#8b5a2b");
+  ctx.fillStyle = bodyGrad;
+  ctx.beginPath();
+  ctx.moveTo(basket.x, basket.y);
+  ctx.lineTo(basket.x + basket.w, basket.y);
+  ctx.quadraticCurveTo(basket.x + basket.w * 0.9, basket.y + basket.h + 10, basket.x + basket.w / 2, basket.y + basket.h);
+  ctx.quadraticCurveTo(basket.x + basket.w * 0.1, basket.y + basket.h + 10, basket.x, basket.y);
+  ctx.closePath();
   ctx.shadowColor = "rgba(0,0,0,0.3)";
   ctx.shadowBlur = 10;
   ctx.fill();
   ctx.shadowBlur = 0;
 
-  // White fuzzy brim
-  ctx.fillStyle = "white";
-  ctx.beginPath();
-  ctx.ellipse(cap.x + cap.w/2, cap.y + cap.h, cap.w/2.1, 8, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Pom-pom highlight for realism
-  ctx.beginPath();
-  ctx.arc(cap.x + cap.w/2, cap.y + cap.h + 10, 5, 0, Math.PI * 2);
-  ctx.fillStyle = "#fff";
-  ctx.shadowColor = "#fff";
-  ctx.shadowBlur = 8;
-  ctx.fill();
-  ctx.shadowBlur = 0;
+  // Basket weave lines
+  ctx.strokeStyle = "rgba(139,69,19,0.4)";
+  ctx.lineWidth = 2;
+  for (let i = 1; i < 4; i++) {
+    ctx.beginPath();
+    ctx.moveTo(basket.x + 5, basket.y + i * 8);
+    ctx.lineTo(basket.x + basket.w - 5, basket.y + i * 8);
+    ctx.stroke();
+  }
 }
 
 function updateObjects() {
@@ -178,8 +180,8 @@ function updateObjects() {
     o.y += o.vy;
     if (o.opacity < 1) o.opacity += 0.05;
 
-    if (o.y + o.h >= cap.y && o.y + o.h <= cap.y + cap.h &&
-        o.x + o.w >= cap.x && o.x <= cap.x + cap.w) {
+    if (o.y + o.h >= basket.y && o.y + o.h <= basket.y + basket.h &&
+        o.x + o.w >= basket.x && o.x <= basket.x + basket.w) {
       if (o.type === 'gift') score += 10;
       else if (o.type === 'candy') score += 5;
       else {
@@ -215,7 +217,7 @@ function loop() {
   ctx.clearRect(0, 0, W, H);
   drawBackground();
   drawObjects();
-  drawCap();
+  drawBasket();
   updateObjects();
   updateHUD();
 
@@ -226,8 +228,8 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
-document.addEventListener("mousemove", e => { cap.x = e.clientX - cap.w/2; });
-document.addEventListener("touchmove", e => { cap.x = e.touches[0].clientX - cap.w/2; });
+document.addEventListener("mousemove", e => { basket.x = e.clientX - basket.w/2; });
+document.addEventListener("touchmove", e => { basket.x = e.touches[0].clientX - basket.w/2; });
 
 loop();
 </script>
